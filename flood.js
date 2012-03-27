@@ -114,7 +114,7 @@ function temp(k, array){
 	//'optionsX' for host option
 	var starttime ;
 	
-	var req = http.request(options2, function(res) {
+	var req = http.request(options1, function(res) {
 			
 		var receivetime = hrtime.time();			
 		var latency = receivetime - req.starttime;
@@ -238,7 +238,7 @@ var stream = fs.createWriteStream('output.txt', {'flags':'a'});
 	stream.write(Math.round(testresult.reqPerSecond)+'\n');
 	stream.write((testresult.numberofrequest)+'\n');
 	stream.write((testresult.mean)+'\n');
-	stream.write((Math.round(testresult.testEndTime/1000000)/1000)+' seconds\n');
+	stream.write((Math.round(testresult.testEndTime/1000000)/1000)+'\n');
 	stream.end();
 	runLinear();
 };
