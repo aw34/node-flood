@@ -5,7 +5,7 @@ var fs =require('fs');
 var userinput = process.argv.slice(2);
 var numberoftest = 0;
 var stop = 10;
-var globalStartTime = hrtime.time();
+var globalStartTime;
 //var numberofrequest =userinput[0];;
 //var intervaltime= userinput[1];
 //var latarray=[];
@@ -19,7 +19,9 @@ var globalStartTime = hrtime.time();
 //var reqPerSecond=0;
 //var testresult;
 var resultarray= [];
-var io = require('socket.io').listen(8001);
+var ioClient = require('socket.io').listen(8001);
+var ioChart =require('socket.io').listen(8088);
+var io = require('socket.io');
 
 http.globalAgent.maxSockets=10000;
 
@@ -27,12 +29,14 @@ var server = http.createServer(function(req, res){
   res.writeHead(200, {'Content-Type': 'text/html'});
   res.write('TEST PAGE');
   res.end();
-}).listen(8080);
+}).listen(8071);
 
-io.sockets.on('connection', function (socket) {
+
+ioClient.sockets.on('connection', function (socket) {
 socket.on('message', function(message){
 if (message == "linear")
                   {  
+		globalStartTime = hrtime.time();
                      run();
                      //console.log("fabonacci(15) = "+n+"--from client");
                      //socket.emit("num", {reqnumber:"use linear"});
@@ -44,7 +48,7 @@ if (message == "linear")
 //pre-entered host options
 var options1 = {  
            host: 'localhost',   
-           port: 8080,
+           port: 8071,
 	   method: 'GET'  
 };
 
@@ -132,7 +136,7 @@ function temp(k, array){
 	});
 	req.on('error', function(e) {
 		console.log('Request #',k,': ERROR',e.message);
-		//testresult.badrequest++;
+		testresult.badrequest++;
 		//console.log('test array length',array.length);
 		//console.log(testresult.numberofrequest);
 		//console.log(testresult.badrequest);
@@ -302,7 +306,29 @@ function runLinear(){
 		} else {
 			//process.exit();
 		console.log('END OF FLOOD');
-		setTimeout(function(){process.exit();},2500);
+		setTimeout(function(){
+
+var connectChart = http.createServer(function(req, res){ 
+  res.writeHead(200, {'Content-Type': 'text/html'});
+  res.write('<head><script src="/socket.io/socket.io.js"></script></head>\n');
+  res.write('<script>var socket = io.connect("http://localhost:8082");\n');
+    res.write('socket.emit("gochart");\n');
+  res.write('</script>\n');
+  res.end();
+}).listen(8072);
+var duh = io.listen(connectChart);
+var options = {  
+           host: 'localhost',   
+           port: 8072,
+	   method: 'GET'  
+};
+	var req = http.request(options, function(res) {console.log('yes');});
+
+console.log('chart should be go to go');
+
+
+						//ioChart.emit('gochart');
+		},100);
 
 
 		};
